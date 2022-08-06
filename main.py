@@ -20,8 +20,7 @@ def MouseWiggle(sleepFor):
 
 time.sleep(0.05)
 
-picture = Image.open("mar"
-                     "io.jpg")
+picture = Image.open("mario.jpg")
 width, height = picture.size
 
 startingPosX = 2362+2
