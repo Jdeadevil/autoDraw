@@ -1,50 +1,82 @@
-import time
+import cv2
 import pyautogui
-import random
-from PIL import Image
-from collections import OrderedDict
-
+import time
+import numpy as np
 i = 0
 
-def MouseWiggle(sleepFor):
-    time.sleep(sleepFor)
-    current_pos = pyautogui.position()
+img_name = "selfport.png"
+img = cv2.imread(f'images/{img_name}')
+img_height = img.shape[0]
+img_width = img.shape[1]
+set_of_colours = set([])
+background_to_remove = tuple(img[0][0])
 
-    for x in range(3):
-        randomX = random.randint(2000, 3700)
-        randomY = random.randint(0, 1600)
-        pyautogui.moveTo(randomX, randomY, 0.25)
+for i in range(img_width):
+    for j in range(img_height):
+        B = int(img[j][i][0])
+        G = int(img[j][i][1])
+        R = int(img[j][i][2])
+        tup = (B, G, R)
+        if tup != background_to_remove:
+            set_of_colours.add(tup)
 
-    pyautogui.moveTo(current_pos)
-    time.sleep(default_time)
 
-time.sleep(0.05)
+for unique in set_of_colours:
+    red = unique[2]
+    green = unique[1]
+    blue = unique[0]
 
-picture = Image.open("mario.jpg")
-width, height = picture.size
+    bgr = [blue, green, red]
 
-startingPosX = 2362+2
-startingPosY = 380+2
+    y, x = np.where(np.all(img == bgr, axis=2))
+    zipped = np.column_stack((x,y))
 
-pyautogui.moveTo(startingPosX, startingPosY)
-pyautogui.click()
-default_time = 0.4
+    time.sleep(0.2)
+    print("Before clicking Edit Colours")
+    if i == 0:
+        pyautogui.click(2916, 84)
 
-for pixelH in range(height):
-    for pixelW in range(width):
-        i += 1
-        r, g, b = picture.getpixel((pixelW, pixelH))
-        print(f"{str(i / (width*height))[2:4]}%")
-        pyautogui.hotkey("f")
-        time.sleep(default_time)
-        pyautogui.typewrite("{0},{1},{2}".format(r, g, b))
-        time.sleep(default_time)
-        pyautogui.hotkey("enter")
-        time.sleep(default_time)
-        pyautogui.click()
-        time.sleep(default_time)
-        pyautogui.moveRel(1, 0)
-        if i % 5 == 0:
-            MouseWiggle(default_time)
-    pyautogui.moveRel(-(width*1), 1)
-    time.sleep(default_time)
+    pyautogui.click(2916, 84)
+    time.sleep(0.2)
+    print("Clicked Edit Colours")
+    # Modify Blue Field
+    pyautogui.click(3074, 639)
+    time.sleep(0.2)
+    pyautogui.hotkey('ctrl', 'a')
+    time.sleep(0.2)
+    pyautogui.press('backspace')
+    time.sleep(0.2)
+    pyautogui.typewrite(str(blue))
+    # Modify Green Field
+    time.sleep(0.2)
+    pyautogui.click(3074, 615)
+    time.sleep(0.2)
+    pyautogui.hotkey('ctrl', 'a')
+    time.sleep(0.2)
+    pyautogui.press('backspace')
+    time.sleep(0.2)
+    pyautogui.typewrite(str(green))
+    # Modify Red Field
+    time.sleep(0.2)
+    pyautogui.click(3074, 596)
+    time.sleep(0.2)
+    pyautogui.hotkey('ctrl', 'a')
+    time.sleep(0.2)
+    pyautogui.press('backspace')
+    time.sleep(0.2)
+    pyautogui.typewrite(str(red))
+    # Exit Dialog
+    time.sleep(0.2)
+    pyautogui.hotkey('enter')
+    # Reassure Pencil Tool
+    time.sleep(0.2)
+    pyautogui.click(2164, 69)
+    time.sleep(0.2)
+
+    for item in range(len(zipped)):
+        pyautogui.click(x=zipped[item][0]+2110, y=zipped[item][1]+230)
+        print(str(item) + " / " + str(len(zipped)) + "\t" + str(i))
+
+    i += 1
+    print(unique)
+
